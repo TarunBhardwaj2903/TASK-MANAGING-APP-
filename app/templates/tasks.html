@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block title %}Tasks{% endblock %}
+
+{% block content %}
+<div class="task-box">
+    <h2>Your Tasks</h2>
+
+    <!-- Add Task -->
+    <form action="{{ url_for('tasks.add_task') }}" method="POST" class="task-form">
+        <input type="text" name="title" placeholder="New task" required>
+        <button type="submit" class="btn">Add</button>
+    </form>
+
+    {% if tasks %}
+        <!-- Clear All Tasks -->
+        <form action="{{ url_for('tasks.clear_task') }}" method="POST" class="task-form">
+            <button type="submit" class="btn btn-clear">Clear All Tasks</button>
+        </form>
+
+        <br>
+
+        <table class="task-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Task</th>
+                    <th>Status</th>
+                    <th>Change</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for task in tasks %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ task.title }}</td>
+                    <td>
+                        <span class="badge {{ task.status|lower }}">{{ task.status }}</span>
+                    </td>
+                    <td>
+                        <form action="{{ url_for('tasks.toggle_status', task_id=task.id) }}" method="POST">
+                            <button class="btn-small" type="submit">Next</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <!-- Chart Section -->
+        <h3 class="chart-title">Task Status Overview</h3>
+        <canvas id="taskChart" width="300" height="300"></canvas>
+
+        <!-- Chart Data and JS -->
+        <script>
+            window.pendingCount = {{ pending_count }};
+            window.workingCount = {{ working_count }};
+            window.doneCount = {{ done_count }};
+        </script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="{{ url_for('static', filename='js/tasks_chart.js') }}"></script>
+
+    {% else %}
+        <p>No tasks yet. Add one above.</p>
+    {% endif %}
+</div>
+{% endblock %}
+
